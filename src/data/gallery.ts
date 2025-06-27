@@ -5,6 +5,7 @@ export interface GalleryItem {
   alt: string;
   title: string;
   description: string;
+  className?: string;
 }
 
 export const galleryItems: GalleryItem[] = [
@@ -15,6 +16,7 @@ export const galleryItems: GalleryItem[] = [
     alt: '那拉提草原的日出',
     title: '草原日出',
     description: '清晨的第一缕阳光洒在广袤的草原上。',
+    className: 'lg:col-span-2 lg:row-span-2',
   },
   {
     id: 2,
@@ -47,6 +49,7 @@ export const galleryItems: GalleryItem[] = [
     alt: '蜿蜒的巩乃斯河',
     title: '生命之河',
     description: '巩乃斯河静静流淌，滋养着这片土地。',
+    className: 'lg:col-span-2',
   },
   {
     id: 6,

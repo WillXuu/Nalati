@@ -6,6 +6,10 @@ const config: Config = {
     "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
     "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
   ],
+  safelist: [
+    'lg:col-span-2',
+    'lg:row-span-2',
+  ],
   theme: {
     extend: {
       backgroundImage: {
