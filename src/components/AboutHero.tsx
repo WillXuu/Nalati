@@ -10,12 +10,61 @@ const formatTime = (timeInSeconds: number) => {
   return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
 };
 
+const getClientStorage = () => {
+  if (typeof window === 'undefined') {
+    return null;
+  }
+
+  const storage = window.localStorage;
+  if (!storage || typeof storage.getItem !== 'function' || typeof storage.setItem !== 'function') {
+    return null;
+  }
+
+  return storage;
+};
+
+const readFromStorage = (key: string) => {
+  try {
+    const storage = getClientStorage();
+    if (!storage) {
+      return null;
+    }
+    return storage.getItem(key);
+  } catch (error) {
+    if (process.env.NODE_ENV !== 'production') {
+      console.warn('localStorage read failed:', error);
+    }
+    return null;
+  }
+};
+
+const writeToStorage = (key: string, value: string) => {
+  try {
+    const storage = getClientStorage();
+    if (!storage) {
+      return;
+    }
+    storage.setItem(key, value);
+  } catch (error) {
+    if (process.env.NODE_ENV !== 'production') {
+      console.warn('localStorage write failed:', error);
+    }
+  }
+};
+
 type LikeAnimation = {
   id: number;
   x: number;
 };
 
-const AboutHero = () => {
+type AboutHeroProps = {
+  mediaType?: 'video' | 'none';
+  mediaSrc?: string;
+};
+
+const DEFAULT_VIDEO_SRC = '/media/about-hero.mp4';
+
+const AboutHero = ({ mediaType = 'video', mediaSrc = DEFAULT_VIDEO_SRC }: AboutHeroProps) => {
   // Player state
   const [isPlaying, setIsPlaying] = useState(true);
   const [isMuted, setIsMuted] = useState(true);
@@ -34,17 +83,17 @@ const AboutHero = () => {
   // On mount, load from localStorage and update views/likes
   useEffect(() => {
     // Likes: Load from cache or use initial state
-    const storedLikes = localStorage.getItem('nalati-video-likes');
+    const storedLikes = readFromStorage('nalati-video-likes');
     if (storedLikes) {
       setLikes(JSON.parse(storedLikes));
     }
 
     // Views: Load from cache, increment, and save back
-    const storedViews = localStorage.getItem('nalati-video-views');
+    const storedViews = readFromStorage('nalati-video-views');
     const initialViews = storedViews ? JSON.parse(storedViews) : views;
     const newViews = initialViews + 1;
     setViews(newViews);
-    localStorage.setItem('nalati-video-views', JSON.stringify(newViews));
+    writeToStorage('nalati-video-views', JSON.stringify(newViews));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -62,7 +111,7 @@ const AboutHero = () => {
   const handleLike = () => {
     setLikes(prevLikes => {
       const newLikes = prevLikes + 1;
-      localStorage.setItem('nalati-video-likes', JSON.stringify(newLikes));
+      writeToStorage('nalati-video-likes', JSON.stringify(newLikes));
       return newLikes;
     });
 
@@ -112,7 +161,7 @@ const AboutHero = () => {
           onTimeUpdate={handleTimeUpdate}
           onLoadedMetadata={handleLoadedMetadata}
         >
-          <source src="/media/about-hero.mp4" type="video/mp4" />
+          <source src={mediaType === 'video' && mediaSrc ? mediaSrc : DEFAULT_VIDEO_SRC} type="video/mp4" />
           您的浏览器不支持视频播放。
         </video>
         

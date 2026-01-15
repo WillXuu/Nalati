@@ -2,8 +2,13 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { galleryItems } from '@/data/gallery';
 
-const GalleryDetailPage = async ({ params }: { params: { id: string } }) => {
-  const item = galleryItems.find(i => i.id === parseInt(params.id));
+type GalleryPageProps = {
+  params: Promise<{ id: string }>;
+};
+
+const GalleryDetailPage = async ({ params }: GalleryPageProps) => {
+  const { id } = await params;
+  const item = galleryItems.find(i => i.id === parseInt(id, 10));
 
   if (!item) {
     return (

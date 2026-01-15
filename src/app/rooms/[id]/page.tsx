@@ -1,8 +1,9 @@
 import Image from 'next/image';
 import { rooms, Room } from '@/data/rooms';
 
-const RoomDetailPage = async ({ params }: { params: { id: string } }) => {
-  const room: Room | undefined = rooms.find(r => r.id === parseInt(params.id));
+const RoomDetailPage = async ({ params }: { params: Promise<{ id: string }> }) => {
+  const { id } = await params;
+  const room: Room | undefined = rooms.find(r => r.id === parseInt(id, 10));
 
   if (!room) {
     return (
